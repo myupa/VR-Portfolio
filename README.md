@@ -1,4 +1,8 @@
 # VR Portfolio 2022 - Manuel Yupa
+
+This portfolio includes scripts and models for two VR experiences built for the Meta Quest, "Your Next Dream Will Begin Shortly" and "Decay Exists As An Extant Form Of Life." Created by Manuel Yupa. They can be downloaded as a single build at https://www.dropbox.com/s/cwlls1771ruwf01/VR%20Portfolio%20Manuel%20Yupa%202022.zip?dl=0
+
+-----------------------------------------------------------------------------------------------
  
 Used BNG's VR Interaction Framework for VR player interaction.
 http://www.beardedninjagames.com/vr-framework/
