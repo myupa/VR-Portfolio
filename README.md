@@ -7,7 +7,7 @@ This portfolio includes scripts and models for two VR experiences built for the 
 Used BNG's VR Interaction Framework for VR player interaction.
 http://www.beardedninjagames.com/vr-framework/
 
-Created the environments in both experiences from mixing and matching individual trees, boulders, and more into forests, mountains, caves, and city streets.
+I created the environments in both experiences from mixing and matching individual trees, boulders, and more into forests, mountains, caves, and city streets.
 Components provided by: JustCreate, Mahall Games, Greyroad Studio, Boxophobic, Beetheart Creative Studio.
 
 Torch Flickering Effect: LightFlickerEffect.cs. Written by Steve Streeting 2017. License: CC0 Public Domain 
