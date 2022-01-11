@@ -13,6 +13,7 @@ public class FishSceneManager : SceneManagerParentClass
     public Animator fishAnimator;
     public Animator teethAnimator;
     public GameObject StartTrigger;
+    public AudioMixerSnapshot StartAudio;
     public AudioMixerSnapshot louder;
     public AudioClip musicBackgroundClip;
     public AudioSource musicBackgroundS;
@@ -29,6 +30,7 @@ public class FishSceneManager : SceneManagerParentClass
 
     public IEnumerator Start()
     {
+        if (StartAudio != null) { StartAudio.TransitionTo(0f); }
         if (musicBackgroundS != null) { musicBackgroundS.PlayOneShot(musicBackgroundClip, musicVolume); }
         yield return new WaitForSeconds(10f);
         if (StartTrigger != null) { StartTrigger.SetActive(true); }

@@ -125,6 +125,8 @@ public class MushroomSceneManager : SceneManagerParentClass
             pressAnyButton.action.Enable();
             pressAnyButton.action.performed += context => StartSequenceOne();
         }
+        yield return new WaitForSeconds(8f);
+        if (!seqOneActivated) { StartSequenceOne(); }
     }
 
     public void AssignValues()
@@ -261,7 +263,7 @@ public class MushroomSceneManager : SceneManagerParentClass
         //KillOffShadows();
         noExitCollider.SetActive(true);
         yield return new WaitForSeconds(8f);
-        RendererFade();//Shadows' renderer
+        FadeRendererMethod();//Shadows' renderer
 
         StartCoroutine("ShadowsThroughFloor");
         yield return new WaitForSeconds(10f);
@@ -319,7 +321,7 @@ public class MushroomSceneManager : SceneManagerParentClass
     public IEnumerator FadeInTorch()
     {
         Material TorchMaterial = TorchRenderer.GetComponent<MeshRenderer>().material;
-        var tempColor = TorchMaterial.color; print("yay?");
+        var tempColor = TorchMaterial.color; 
 
         float time = 0f;
         while (time < 1f)

@@ -8,16 +8,21 @@ public class CloudFader : MonoBehaviour
 
     public void Start()
     {
-        GoddessSceneManager.FadeInClouds += FadeCloudsIn;
+        GoddessSceneManager.FadeInClouds += FadeCloudsIn; 
         cloudtransp = gameObject.GetComponent<Renderer>();
     }
 
-    public void FadeCloudsIn() { StartCoroutine("FadeCloudsRoutine"); }
+    public void OnDestroy()
+    {
+        GoddessSceneManager.FadeInClouds -= FadeCloudsIn;
+    }
+
+    public void FadeCloudsIn() { if (cloudtransp != null) { StartCoroutine("FadeCloudsRoutine"); } }
 
     public IEnumerator FadeCloudsRoutine()
     {
         float time = 0f;
-        var tempColor = cloudtransp.GetComponent<Renderer>().material.color;
+        var tempColor = cloudtransp.GetComponent<Renderer>().material.color; 
         while (time < 1f)
         {
             time += Time.deltaTime * .1f;

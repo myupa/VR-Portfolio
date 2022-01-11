@@ -34,6 +34,7 @@ public class ShadowController : MonoBehaviour
         MushroomSceneManager.SpeedUpNavAgents += SpeedUpWalking;
         MushroomSceneManager.KillOffShadows += KillOffShadow;
         MushroomSceneManager.ShadowsSpeak += Speak;
+        //MushroomSceneManager.ShadowsGoQuiet += ShutUp;
     }
 
     public void OnDestroy()
@@ -43,6 +44,7 @@ public class ShadowController : MonoBehaviour
         MushroomSceneManager.SpeedUpNavAgents -= SpeedUpWalking;
         MushroomSceneManager.KillOffShadows -= KillOffShadow;
         MushroomSceneManager.ShadowsSpeak -= Speak;
+        //MushroomSceneManager.ShadowsGoQuiet -= ShutUp;
     }
 
     void Speak()
@@ -87,6 +89,7 @@ public class ShadowController : MonoBehaviour
     {
         float wait = UnityEngine.Random.Range(0f, 1.5f);
         yield return new WaitForSeconds(wait);
+        //navAgent.speed = .65f;
         navAgent.isStopped = false;
         animator.SetTrigger("StartWalking");
     }
@@ -105,7 +108,7 @@ public class ShadowController : MonoBehaviour
     {
         if (animator != null && navAgent != null)
         {
-            navAgent.speed = .075f;
+            //navAgent.speed = .9f;
         }
     }
 
@@ -163,12 +166,12 @@ public class ShadowController : MonoBehaviour
         if (puppetMaster != null)
         {
             animator.SetFloat("DeathSpeed", deathSpeed);
-            if (deathtype == 0) { animator.SetTrigger("Death"); print("a"); } 
-            if (deathtype == 1) { animator.SetTrigger("Death2"); print("b"); } 
-            if (deathtype == 2) { animator.SetTrigger("Death3"); print("c"); } 
-            if (deathtype == 3) { animator.SetTrigger("Death4"); print("d"); } 
-            if (deathtype == 4) { animator.SetTrigger("Death5"); print("e"); } 
-            if (deathtype == 5) { animator.SetTrigger("Death6"); print("f"); } 
+            if (deathtype == 0) { animator.SetTrigger("Death"); } 
+            if (deathtype == 1) { animator.SetTrigger("Death2"); } 
+            if (deathtype == 2) { animator.SetTrigger("Death3"); } 
+            if (deathtype == 3) { animator.SetTrigger("Death4");  } 
+            if (deathtype == 4) { animator.SetTrigger("Death5");  } 
+            if (deathtype == 5) { animator.SetTrigger("Death6");  } 
 
             puppetMaster.SwitchToKinematicMode();
         }
@@ -178,6 +181,7 @@ public class ShadowController : MonoBehaviour
             if (renderer != null)
             {
                 SkinnedMeshRenderer shadow = renderer.GetComponent<SkinnedMeshRenderer>();
+                //shadow.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             }
         }
 
