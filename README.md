@@ -2,7 +2,7 @@
 
 This portfolio includes the below:
 
-"VR Tools," a Unity VR project expanding BNG's VR Interaction Framework with tools to provide interaction guidance and more to players in VR. For example: display blue grab point hands on grabbable objects, based on a player's dominant hand. Highlight collider triggers to guide interaction. Reset items to their point of origin. And, for underwater scenarios, create water waves through hand motion to affect the surrounding environment. This includes scripts. This project can be downloaded at https://drive.google.com/file/d/1_v7PDv75qlZv9y-9Pty3BquM4xxyFNZI/view?usp=sharing
+"VR Tools," a Unity VR project expanding BNG's VR Interaction Framework with tools to provide interaction guidance and more to players in VR. For example: display guide hands on grabbable objects, based on a player's dominant hand. Highlight collider triggers to guide interaction. Reset items to their point of origin. And for underwater scenarios: create water waves using hand motion to affect the environemnt, and trigger bioluminscence through physical contact. This includes scripts. This project can be downloaded at https://drive.google.com/file/d/1_v7PDv75qlZv9y-9Pty3BquM4xxyFNZI/view?usp=sharing
 
 "Your Next Dream Will Begin Shortly" and "Decay Exists As An Extant Form Of Life," two Unity VR experiences built for the Meta Quest. This also includes scripts and 3D models. The experiences can be downloaded as a single build at https://www.dropbox.com/s/9wz284k3k2hv511/Unity%20VR%20Portfolio%20-%20Emmy%20Yupa%202022.zip?dl=0
 
