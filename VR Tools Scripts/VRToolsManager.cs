@@ -8,10 +8,10 @@ public class VRToolsManager : MonoBehaviour
 
     public static VRToolsManager instance;
     private void Awake() { instance = this; }
-    bool allowButtons = false;
+    public BNG.SceneLoader sceneLoader;
 
     //Guide Hand Tools
-    //
+
     public enum HandDominance { RightHanded, LeftHanded, Ambidextrous}
     [Header("Grab Point Guides to Show")]
     public HandDominance dominantHand;
@@ -42,11 +42,8 @@ public class VRToolsManager : MonoBehaviour
 
     public void ToggleHands()
     {
-        if (allowButtons)
-        {
-            if (!showingGuideHands) { ShowGuideHands(); showingGuideHands = true; }
-            else { HideGuideHands(); showingGuideHands = false; }
-        }
+        if (!showingGuideHands) { ShowGuideHands(); showingGuideHands = true; }
+        else { HideGuideHands(); showingGuideHands = false; }
     }
 
 
@@ -59,11 +56,8 @@ public class VRToolsManager : MonoBehaviour
 
     public void ToggleRegions()
     {
-        if (allowButtons)
-        {
-            if (!showingRegions) { ShowRegions(); showingRegions = true; }
-            else { HideRegions(); showingRegions = false; }
-        }
+        if (!showingRegions) { ShowRegions(); showingRegions = true; }
+        else { HideRegions(); showingRegions = false; }
     }
 
     void ShowRegions()
@@ -97,49 +91,25 @@ public class VRToolsManager : MonoBehaviour
         Highlights.Add(guidingRegion);
     }
 
-    //Toggle Underwater Mode & Tools
+    //Toggle Underwater Scenery & Tools
     //
-    [Header("Underwater Components")]
-    public GameObject Whale; 
-    public MakeWaves[] WaveComponents;
-    bool isUnderwater = false;
-
-    public void ToggleUnderwater()
-    {
-        if (allowButtons)
-        {
-            if (!isUnderwater) { GoUnderwater(); isUnderwater = true; }
-            else { LeaveUnderwater(); isUnderwater = false; }
-        }
-
-    }
-
     public void GoUnderwater()
     {
-        foreach(MakeWaves makeWaves in WaveComponents)
-        {
-            makeWaves.enabled = true;
-        }
-        if (Whale != null) { Whale.SetActive(true); }
-        RenderSettings.fog = true;
-        Physics.gravity = new Vector3(0f, -.25f, 0f);
+        Physics.gravity = new Vector3(0f, -.75f, 0f); 
+        if (sceneLoader != null) { sceneLoader.LoadScene("VR Underwater"); }
     }
 
     public void LeaveUnderwater()
     {
-        foreach (MakeWaves makeWaves in WaveComponents)
-        {
-            makeWaves.enabled = false;
-        }
-        if (Whale != null) { Whale.SetActive(false); }
-        RenderSettings.fog = false;
         Physics.gravity = new Vector3(0f, -7.81f, 0f);
+        if (sceneLoader != null) { sceneLoader.LoadScene("VR Tools"); }
     }
 
     //Reset Item Position/Rotations
     //
 
     public event Action resetObjectState;
+
     public void ResetObjectState()
     {
         if (resetObjectState != null)
