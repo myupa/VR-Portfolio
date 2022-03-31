@@ -104,7 +104,6 @@ public class MushroomSceneManager : SceneManagerParentClass
     public void Start() 
     { 
         StartCoroutine("StartingScreenRoutine");
-        //StartSequenceOne();
     }
 
     public void Update()
@@ -115,7 +114,6 @@ public class MushroomSceneManager : SceneManagerParentClass
 
     IEnumerator StartingScreenRoutine()
     {
-        //StartSequenceOne(); yield return null;
         RenderSettings.skybox.SetFloat("_Exposure", 1.1f);
         yield return new WaitForSeconds(3f);
         if (StartingText != null) { StartingText.SetActive(true); }
@@ -232,7 +230,7 @@ public class MushroomSceneManager : SceneManagerParentClass
     void ShuffleArrayOrder(ShadowController[] array)
     {
         //Rearranges the array of Shadow characters.
-        //Knuth shuffle algorithm :: courtesy of Wikipedia :)
+        //Knuth shuffle algorithm
         for (int t = 0; t < array.Length; t++)
         {
             ShadowController shadow = array[t];

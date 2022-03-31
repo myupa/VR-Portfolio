@@ -25,7 +25,7 @@ public class GoddessSceneManager : SceneManagerParentClass
     public Animator godAnimator;
     public GameObject StartingText;
     Transform PlayerTransform;
-    Quaternion targetrotx;//= new Quaternion();
+    Quaternion targetrotx;
 
     [Header("Water & Rain")]
     public GameObject risingWater;
@@ -56,8 +56,6 @@ public class GoddessSceneManager : SceneManagerParentClass
     {
         StartCoroutine("StartingScreenRoutine");
         targetrotx.Set(0f, 0f, 0.9999383f, 0.0111104f);
-        print(targetrotx);
-        //return targetrotx;
         if (StartAudio != null) { StartAudio.TransitionTo(0f); }
     } 
     
@@ -116,19 +114,6 @@ public class GoddessSceneManager : SceneManagerParentClass
         SceneTransitionManager.STManager.GoToScene("Loading Brain", 1f);
     }
 
-    /*
-    public IEnumerator FogFade()
-    {
-        float time = 0f;
-        while (time < 1f)
-        {
-            time += Time.deltaTime * .15f;
-            RenderSettings.fogDensity = Mathf.Lerp(.25f, .0724f, Mathf.SmoothStep(0.0f, 1.0f, time));
-            yield return null;
-        }
-    }
-    */
-
     public IEnumerator RainDown()
     {
         if (rScriptGO != null)
@@ -138,7 +123,6 @@ public class GoddessSceneManager : SceneManagerParentClass
             float time = 0f;
             while (time < 1f)
             {
-                //float rFLOAT = rScript.GetComponent<RainIntensity>();//.RainIntensity;
                 time += Time.deltaTime * .1f;
                 rScript.RainIntensity = Mathf.Lerp(0, 1, time);
                 yield return null;
@@ -151,8 +135,6 @@ public class GoddessSceneManager : SceneManagerParentClass
         if (risingWater != null)
         {
             yield return new WaitForSeconds(4.5f);
-            // start = new Vector3(transform.position.x, transform.position.y, transform.position.z);
-            // des = new Vector3(transform.position.x, 10f, transform.position.z);
             risingWater.SetActive(true);
             Transform WaterTransform = risingWater.GetComponent<Transform>();
             float time = 0f;
@@ -173,7 +155,6 @@ public class GoddessSceneManager : SceneManagerParentClass
         float time = 0f;
         while (time < 8f)
         {
-            //yield return new WaitForSeconds(2f);
             time += Time.deltaTime * .1f;
             float ExposureF = Mathf.Lerp(1f, .5f, time);
             RenderSettings.skybox.SetFloat("_Exposure", ExposureF);
@@ -208,7 +189,6 @@ public class GoddessSceneManager : SceneManagerParentClass
             float playerLerp = 0f;
 
             Quaternion initialrotx = PlayerTransform.rotation;
-            //Quaternion targetrotx = Quaternion.Euler(initialrotx.x - 70f, initialrotx.y - 120f, initialrotx.z - 0f);
 
             while (playerLerp < 2.5f)
             {
