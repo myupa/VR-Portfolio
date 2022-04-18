@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 
-public class PunAnimStateSync : StateMachineBehaviour
+public class PhotonAnimStateSync : StateMachineBehaviour
 {
-    //Sync Animation States
+    //Sync animation states by placing this on animation state machines.
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         int animHash = GetNameHash(stateInfo);
@@ -14,11 +14,11 @@ public class PunAnimStateSync : StateMachineBehaviour
         {
             if (!PhotonNetwork.InRoom)
             {
-                PunObjectSync._ObjectSync.AddAnimState(animator.ToString(), animHash);
+                PhotonMasterSync.instance.AddAnimState(animator.ToString(), animHash);
             }
             else
             {
-                PunObjectSync._ObjectSync.UpdateAnimState(animator.ToString(), animHash);
+                PhotonMasterSync.instance.UpdateAnimState(animator.ToString(), animHash);
             }
         }
     }

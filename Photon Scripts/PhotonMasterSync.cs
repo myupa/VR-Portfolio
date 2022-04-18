@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using Sirenix.OdinInspector;
 
 public class PunObjectSync : MonoBehaviourPunCallbacks
 {
@@ -9,27 +10,49 @@ public class PunObjectSync : MonoBehaviourPunCallbacks
     //Use "add value/data/etc" methods to create and assign values, usually when the master client is creating a room and hasn't yet uploaded a hashtable.
     //Use "update value/data/etc" methods for values added or updated after the master client created a room. This will catch up values for players that join later.
 
-    public GameObject[] sensors; //In-game sensors. Photon needs to always be aware of them through inspector reference.
-    public GameObject[] uniqueObjects; //Objects important to gameplay. Photon needs to always be aware of them through inspector reference.
-    public Animator animator; 
-    private ExitGames.Client.Photon.Hashtable roomHashTable = new ExitGames.Client.Photon.Hashtable();
+    [Header("Game Objects")]
+    public GameObject[] sensors; //In-game sensors
+    public GameObject[] uniqueObjects; //Non-instantiated objects important to gameplay
+    private ExitGames.Client.Photon.Hashtable initHashTable = new ExitGames.Client.Photon.Hashtable(); //To locally save object/sensor states from scene start
+    private ExitGames.Client.Photon.Hashtable roomHashTable = new ExitGames.Client.Photon.Hashtable(); //To sync with Photon
 
-    public static PunObjectSync _ObjectSync;
+    [Header("Animations")]
+    public Animator animator;
+    bool initialAnimStateSaved = false;
 
-    [Button]
-    void PrintAll()
-    {
-        roomHashTable = PhotonNetwork.CurrentRoom.CustomProperties;
-        print(roomHashTable);
-    }
+    public static PhotonMasterSync instance;
 
     private void Awake() 
     {
-        if (_ObjectSync == null) { _ObjectSync = this; }
-        else if (_ObjectSync != this) { Destroy(gameObject); }
+        if (instance == null) { instance = this; }
+        else if (instance != this) { Destroy(gameObject); }
     }
 
-    void Start() { SetSensorValues(); }
+    void Start() 
+    { 
+        SetInitialSensorStates(); //Saves initial states of Sensors to local hashtable for each player. Reloading states uses these values.
+        SetInitialUniqueObjectStates(); //Saves initial states of Single Objects to local hashtable for each player. Reloading states uses these values.
+        if (SimulationEvents.instance != null)
+        {
+            SimulationEvents.instance.onReloadStates += ResetSensors;
+            SimulationEvents.instance.onReloadStates += ResetSingleStates;
+            SimulationEvents.instance.onReloadStates += ResetAnimState;
+        }
+    }
+
+    private void OnDisable()
+    {
+        base.OnDisable();
+        if (SimulationEvents.instance != null)
+        {
+            SimulationEvents.instance.onReloadStates -= ResetSensors;
+            SimulationEvents.instance.onReloadStates -= ResetSingleStates;
+            SimulationEvents.instance.onReloadStates -= ResetAnimState;
+        }
+    }
+
+    [Button][PunRPC] //Called as RPC, to be used by each player by syncing to their (identical) local initHashTables
+    public void Reset() { SimulationEvents.instance.OnReloadStates(); }
 
     public override void OnJoinedRoom()
     {
@@ -38,12 +61,6 @@ public class PunObjectSync : MonoBehaviourPunCallbacks
         SyncSensorValues(); 
         SyncAnimState(animator.ToString());
         SyncSingleStates();
-    }
-
-    public override void OnLeftRoom() //The below code deletes the Photon hashtable when master client leaves. 
-    {
-        if (PhotonNetwork.IsMasterClient) { PhotonNetwork.CurrentRoom.SetCustomProperties(null); }
-        roomHashTable = null;
     }
 
     public void InitiateHashTable() 
@@ -59,6 +76,14 @@ public class PunObjectSync : MonoBehaviourPunCallbacks
         if (!PhotonNetwork.OfflineMode) 
         { 
             if (!PhotonNetwork.IsMasterClient) { roomHashTable = PhotonNetwork.CurrentRoom.CustomProperties; }
+        }
+    }
+
+    public void SetInitialValue(string HashName, int Value)
+    {
+        if (!PhotonNetwork.OfflineMode)
+        {
+            if (initHashTable[HashName] == null) { initHashTable.Add(HashName, Value); }
         }
     }
 
@@ -129,23 +154,34 @@ public class PunObjectSync : MonoBehaviourPunCallbacks
     {
         if (!PhotonNetwork.IsMasterClient)
         {
-            if (PhotonNetwork.CurrentRoom.CustomProperties[animatorName] == null) { print(animatorName + "is null"); }
-            else { int State = (int)PhotonNetwork.CurrentRoom.CustomProperties[animatorName]; animator.Play(State, 0, 1f); }
+            if (PhotonNetwork.CurrentRoom.CustomProperties[animatorName] == null) { print(animatorName + " anim Hashtable value missing."); }
+            else 
+            { 
+                int state = (int)PhotonNetwork.CurrentRoom.CustomProperties[animatorName]; 
+                animator.Play(state, 0, 1f); 
+            }
         }
     }
 
-    void SetSensorValues()
+    public void ResetAnimState()
+    {
+        int state;
+        if (initHashTable[animator.ToString()] != null)
+        {
+            state = (int)initHashTable[animator.ToString()];
+            animator.Play(state, 0, 0f);
+        }
+    }
+
+    void SetInitialSensorStates()
     {
         foreach (GameObject sensor in sensors)
         {
-            if (sensor.activeSelf == false)
-            {
-                int State = 0; roomHashTable.Add(sensor.name, State); 
-            }
-            if (sensor.activeSelf == true)
-            {
-                int State = 1; roomHashTable.Add(sensor.name, State);
-            }
+            int state;
+            if (sensor.activeSelf == true ) { state = 1; }
+            else { state = 0; }
+            roomHashTable.Add(sensor.name, state); 
+            initHashTable.Add(sensor.name, state);
         }
     }
 
@@ -164,7 +200,27 @@ public class PunObjectSync : MonoBehaviourPunCallbacks
                     else { sensor.SetActive(false); }
                 }
             } }
-    } 
+    }
+
+    public void ResetSensors() 
+    {
+        if (!PhotonNetwork.OfflineMode)
+        {
+            foreach (GameObject sensor in sensors) { sensor.SetActive(false); }
+        }
+    }
+
+    void SetInitialUniqueObjectStates()
+    {
+        foreach (GameObject thing in uniqueObjects)
+        {
+            int state;
+            if (thing.activeSelf == true) { state = 0; }
+            else { state = 1; }
+            initHashTable.Add(thing.name, state); 
+            roomHashTable.Add(thing.name, state);
+        }
+    }
 
     void SyncSingleStates() //Syncing the state of unique objects -- active or inactive.
     {
@@ -185,10 +241,29 @@ public class PunObjectSync : MonoBehaviourPunCallbacks
         }
     }
 
+    public void ResetSingleStates()
+    {
+        if (!PhotonNetwork.OfflineMode)
+        {
+            foreach (GameObject thing in SingleObjects)
+            {
+                string hashstring = thing.name; object state;
+                if (initHashTable.TryGetValue(hashstring, out state))
+                {
+                    if (state is 0) { thing.SetActive(false); }
+                    if (state is 1) { thing.SetActive(true); }
+                }
+                else { }
+            }
+        }
+    }
+
+    [Button]
     void CheckValues()
     {
-        print("localhash: " + roomHashTable);
-        print("networkedhash: " + PhotonNetwork.CurrentRoom.CustomProperties);
+        print("Local hashtable: " + roomHashTable);
+        print("Networked hashtable: " + PhotonNetwork.CurrentRoom.CustomProperties);
+        print("Initial hashtable " + initHashTable);
     }
 
 }
