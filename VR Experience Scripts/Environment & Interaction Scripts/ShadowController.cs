@@ -34,7 +34,6 @@ public class ShadowController : MonoBehaviour
         MushroomSceneManager.SpeedUpNavAgents += SpeedUpWalking;
         MushroomSceneManager.KillOffShadows += KillOffShadow;
         MushroomSceneManager.ShadowsSpeak += Speak;
-        //MushroomSceneManager.ShadowsGoQuiet += ShutUp;
     }
 
     public void OnDestroy()
@@ -44,7 +43,6 @@ public class ShadowController : MonoBehaviour
         MushroomSceneManager.SpeedUpNavAgents -= SpeedUpWalking;
         MushroomSceneManager.KillOffShadows -= KillOffShadow;
         MushroomSceneManager.ShadowsSpeak -= Speak;
-        //MushroomSceneManager.ShadowsGoQuiet -= ShutUp;
     }
 
     void Speak()
@@ -89,7 +87,7 @@ public class ShadowController : MonoBehaviour
     {
         float wait = UnityEngine.Random.Range(0f, 1.5f);
         yield return new WaitForSeconds(wait);
-        //navAgent.speed = .65f;
+        navAgent.speed = .65f;
         navAgent.isStopped = false;
         animator.SetTrigger("StartWalking");
     }
@@ -108,7 +106,7 @@ public class ShadowController : MonoBehaviour
     {
         if (animator != null && navAgent != null)
         {
-            //navAgent.speed = .9f;
+            navAgent.speed = .9f;
         }
     }
 
@@ -144,7 +142,7 @@ public class ShadowController : MonoBehaviour
 
     public void ExternalKill()
     {
-        StartCoroutine("ShadowDeathRoutine"); // Currently the one used of this and the below method
+        StartCoroutine("ShadowDeathRoutine");
     }
 
     public void KillOffShadow()
@@ -181,7 +179,7 @@ public class ShadowController : MonoBehaviour
             if (renderer != null)
             {
                 SkinnedMeshRenderer shadow = renderer.GetComponent<SkinnedMeshRenderer>();
-                //shadow.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                shadow.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             }
         }
 
