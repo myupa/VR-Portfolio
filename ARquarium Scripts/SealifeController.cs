@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody))]
+
 public class SealifeController : MonoBehaviour
 {
     public enum sealifeForwardDirection
@@ -10,13 +12,20 @@ public class SealifeController : MonoBehaviour
         ahead,
     }
 
-    [Header("Sealife Movement")]
-    public sealifeForwardDirection SealifeForwardDirection;
+    [Header("Sealife")]
     public Rigidbody sealifeRB;
+    public float Speed = 10f;
+
+    [Header("Follow The Player")]
+    public bool followThatPlayer = false;
+    public Transform target;
+    public float stopDistance = 1f;
+
+    [Header("Or Free Float")]
+    public sealifeForwardDirection SealifeForwardDirection;
     public Transform rayOrigin;
-    public float Speed = 3f;
-    public float minimumSpeed = .01f;
     public float avoidanceDistance;
+    public float minimumSpeed = .02f;
 
     Vector3 forwardVector;
     Vector3 rotationAxis;
@@ -38,16 +47,17 @@ public class SealifeController : MonoBehaviour
 
     void Start()
     {
-        if (intermediate != null) { intermRB = intermediate.GetComponent<Rigidbody>(); }
+        //These vector checks are to create appropriate movement depending on the type of sealife
+        //For example, sealife that moves like salmon sealife or sealife that moves like octopi
         switch (SealifeForwardDirection)
         {
             case sealifeForwardDirection.up:
                 forwardVector = Vector3.up;
                 rotationAxis = -transform.forward;
-                pitchAxis =  transform.right;
+                pitchAxis = transform.right;
                 break;
             case sealifeForwardDirection.ahead:
-                forwardVector = Vector3.forward; 
+                forwardVector = Vector3.forward;
                 rotationAxis = transform.up;
                 pitchAxis = transform.right;
                 break;
@@ -61,15 +71,27 @@ public class SealifeController : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (rayOrigin != null)
+        if (followThatPlayer)
+        {
+            if (target != null)
+            {
+                if (Vector3.Distance(transform.position, target.position) > stopDistance)//Stop at a certain distance
+                {
+                    q = Quaternion.LookRotation(target.position - transform.position); //Rotate towards player
+                    transform.rotation = Quaternion.Slerp(transform.rotation, q, Time.deltaTime * Speed);
+                    sealifeRB.AddForce(transform.forward * Speed, ForceMode.Force); //Move towards player
+                }
+            }
+
+        }
+        else if (rayOrigin != null)
         {
             int layerMask = 1 << 12;
             layerMask = ~layerMask;
 
-            //These vector checks are to create appropriate movement depending on the type of sealife
-            //For example, sealife that moves like salmon sealife or sealife that moves like octopi
             var raycastDirection = CheckForwardVectorForRaycast();
             var raycastUpDirection = CheckUpVectorForRaycast();
+            var correctionVector = CheckForwardVectorForCorrection();
 
             //Check left and right raycasts for upcoming collisions
             if (Physics.SphereCast(rayOrigin.transform.position, .1f, (raycastDirection - transform.right), out leftHitData, avoidanceDistance * horizMultiplier, layerMask)) { avoidLeft = true; } else { avoidLeft = false; }
@@ -120,7 +142,7 @@ public class SealifeController : MonoBehaviour
                     }
                 }
             }
-        
+
             else
             { //Move forward if forward raycast doesn't see anything ahead, but turn a little if side raycasts do
                 if (sealifeRB.velocity.magnitude < .01f) { sealifeRB.AddTorque(rotationAxis * Speed * Random.Range(-10f, 10f), ForceMode.Impulse); } //Stuck? Scramble
@@ -153,22 +175,24 @@ public class SealifeController : MonoBehaviour
             {
                 sealifeRB.AddTorque(-pitchAxis * Speed * .125f, ForceMode.Force);
             }
+
+            // X- & Z-axis correction to keep sealife upright
+            q = Quaternion.FromToRotation(raycastUpDirection, correctionVector) * transform.rotation;
+            transform.rotation = Quaternion.Slerp(transform.rotation, q, Time.deltaTime * Speed * .5f);
         }
 
-        // X- & Z-axis correction to keep sealife upright
-        q = Quaternion.FromToRotation(CheckUpVectorForRaycast(), CheckForwardVectorForCorrection()) * transform.rotation; 
-        transform.rotation = Quaternion.Slerp(transform.rotation, q, Time.deltaTime * Speed * .5f);
-        
-        }
 
-    IEnumerator TurnAround() //Turn around in a random direction
+
+    }
+
+    IEnumerator TurnAround()
     {
         sealifeRB.AddTorque(rotationAxis * Speed * Random.Range(-3f, 3f), ForceMode.Impulse);
         yield return new WaitForSeconds(2f);
         turningAway = false;
     }
 
-    IEnumerator TurnAway(string direction) //Turn away with more force in a specific direction
+    IEnumerator TurnAway(string direction)
     {
         if (direction == "right") { sealifeRB.AddTorque(rotationAxis * Speed * Random.Range(4f, 6f), ForceMode.Impulse); }
         else { sealifeRB.AddTorque(-rotationAxis * Speed * Random.Range(4f, 6f), ForceMode.Impulse); }
@@ -176,7 +200,7 @@ public class SealifeController : MonoBehaviour
         turningAway = false;
     }
 
-    IEnumerator PanicTurn() //Turn around forcefully in a random direction
+    IEnumerator PanicTurn()
     {
         sealifeRB.AddTorque(rotationAxis * Speed * Random.Range(-8f, 8f), ForceMode.Impulse);
         yield return new WaitForSeconds(2f);
@@ -197,14 +221,14 @@ public class SealifeController : MonoBehaviour
         else { return transform.up; }
     }
 
-    Vector3 CheckForwardVectorForCorrection() 
+    Vector3 CheckForwardVectorForCorrection()
     {
         if (SealifeForwardDirection == sealifeForwardDirection.ahead) { return Vector3.up; }
         else if (SealifeForwardDirection == sealifeForwardDirection.up) { return -Vector3.up; }
         else { return Vector3.up; }
     }
 
-    private void OnDrawGizmosSelected() //For visual debugging purposes
+    private void OnDrawGizmosSelected()
     {
         var raycastDirection = CheckForwardVectorForRaycast();
         var raycastUpDirection = CheckUpVectorForRaycast();
@@ -212,7 +236,7 @@ public class SealifeController : MonoBehaviour
         float horizontal = avoidanceDistance * horizMultiplier;
         float vertical = avoidanceDistance * vertMultiplier;
 
-        Debug.DrawRay(rayOrigin.transform.position, raycastDirection  * avoidanceDistance, Color.red, .1f, true);
+        Debug.DrawRay(rayOrigin.transform.position, raycastDirection * avoidanceDistance, Color.red, .1f, true);
         Debug.DrawRay(rayOrigin.transform.position, (raycastDirection * horizontal + transform.right * horizontal), Color.red, .1f, true);
         Debug.DrawRay(rayOrigin.transform.position, (raycastDirection * horizontal - transform.right * horizontal), Color.red, .1f, true);
         Debug.DrawRay(rayOrigin.transform.position, (raycastDirection * vertical - raycastUpDirection * vertical), Color.red, .1f, true);
