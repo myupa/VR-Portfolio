@@ -1,4 +1,4 @@
-# XR Portfolio 2022 - Manuel Yupa
+# XR Portfolio 2022 - Emmy Yupa
 
 This portfolio includes the below:
 
