@@ -14,18 +14,19 @@ public class SealifeController : MonoBehaviour
 
     [Header("Sealife")]
     public Rigidbody sealifeRB;
-    public float Speed = 10f;
+    public float forwardSpeed = 3f;
+    public float turnSpeed = .3f;
 
-    [Header("Follow The Player")]
+    [Header("Free Float")]
+    public Transform rayOrigin;
+    public sealifeForwardDirection SealifeForwardDirection;
+    public float avoidanceDistance;
+    public float minimumSpeed = .03f;
+
+    [Header("Or Follow The Player")]
     public bool followThatPlayer = false;
     public Transform target;
     public float stopDistance = 1f;
-
-    [Header("Or Free Float")]
-    public sealifeForwardDirection SealifeForwardDirection;
-    public Transform rayOrigin;
-    public float avoidanceDistance;
-    public float minimumSpeed = .02f;
 
     Vector3 forwardVector;
     Vector3 rotationAxis;
@@ -42,8 +43,11 @@ public class SealifeController : MonoBehaviour
     bool avoidRight = false;
     bool turningAway = false;
 
-    float horizMultiplier = .8f;
+    float horizMultiplier = 1.25f;
     float vertMultiplier = .4f;
+
+    [Header("Debug")]
+    [SerializeField] float velocity;
 
     void Start()
     {
@@ -67,6 +71,14 @@ public class SealifeController : MonoBehaviour
                 pitchAxis = transform.right;
                 break;
         }
+        float randomMultiplier = Random.Range(.75f, 1.25f);
+        forwardSpeed = forwardSpeed * randomMultiplier;
+        turnSpeed = turnSpeed * randomMultiplier;
+    }
+
+    void Update()
+    {
+        velocity = sealifeRB.velocity.magnitude;
     }
 
     void FixedUpdate()
@@ -78,8 +90,8 @@ public class SealifeController : MonoBehaviour
                 if (Vector3.Distance(transform.position, target.position) > stopDistance)//Stop at a certain distance
                 {
                     q = Quaternion.LookRotation(target.position - transform.position); //Rotate towards player
-                    transform.rotation = Quaternion.Slerp(transform.rotation, q, Time.deltaTime * Speed);
-                    sealifeRB.AddForce(transform.forward * Speed, ForceMode.Force); //Move towards player
+                    transform.rotation = Quaternion.Slerp(transform.rotation, q, Time.deltaTime * forwardSpeed);
+                    sealifeRB.AddForce(transform.forward * forwardSpeed, ForceMode.Force); //Move towards player
                 }
             }
 
@@ -104,8 +116,8 @@ public class SealifeController : MonoBehaviour
                 {
                     if (sealifeRB.velocity.magnitude > minimumSpeed) //Turn right
                     {
-                        sealifeRB.AddRelativeForce(forwardVector * Speed * .5f, ForceMode.Force);
-                        sealifeRB.AddTorque(rotationAxis * Speed * .025f, ForceMode.Force);
+                        sealifeRB.AddRelativeForce(forwardVector * forwardSpeed * .5f, ForceMode.Force);
+                        sealifeRB.AddTorque(rotationAxis * turnSpeed, ForceMode.Force);
                     }
                     else { if (!turningAway) { turningAway = true; StartCoroutine(TurnAway("right")); } } //Scramble right
                 }
@@ -113,8 +125,8 @@ public class SealifeController : MonoBehaviour
                 {
                     if (sealifeRB.velocity.magnitude > minimumSpeed) //Turn left
                     {
-                        sealifeRB.AddRelativeForce(forwardVector * Speed * .5f, ForceMode.Force);
-                        sealifeRB.AddTorque(-rotationAxis * Speed * .025f, ForceMode.Force);
+                        sealifeRB.AddRelativeForce(forwardVector * forwardSpeed * .5f, ForceMode.Force);
+                        sealifeRB.AddTorque(-rotationAxis * forwardSpeed * turnSpeed, ForceMode.Force);
                     }
                     else { if (!turningAway) { turningAway = true; StartCoroutine(TurnAway("left")); } } //Scramble left
                 }
@@ -144,65 +156,63 @@ public class SealifeController : MonoBehaviour
             }
 
             else
-            { //Move forward if forward raycast doesn't see anything ahead, but turn a little if side raycasts do
-                if (sealifeRB.velocity.magnitude < .01f) { sealifeRB.AddTorque(rotationAxis * Speed * Random.Range(-10f, 10f), ForceMode.Impulse); } //Stuck? Scramble
+            { //Move forward if forward raycast doesn't see anything ahead, but turn a little if side raycasts do. This is the usual movement.
                 if (avoidLeft && !avoidRight) //Turn right a little
                 {
-                    sealifeRB.AddRelativeForce(forwardVector * Speed, ForceMode.Force);
-                    sealifeRB.AddTorque(rotationAxis * Speed * .025f, ForceMode.Acceleration);
+                    sealifeRB.AddRelativeForce(forwardVector * forwardSpeed, ForceMode.Force);
+                    sealifeRB.AddTorque(rotationAxis * turnSpeed, ForceMode.Acceleration);
                 }
                 else if (avoidRight && !avoidLeft) //Turn left a little
                 {
-                    sealifeRB.AddRelativeForce(forwardVector * Speed, ForceMode.Force);
-                    sealifeRB.AddTorque(-rotationAxis * Speed * .025f, ForceMode.Acceleration);
+                    sealifeRB.AddRelativeForce(forwardVector * forwardSpeed, ForceMode.Force);
+                    sealifeRB.AddTorque(-rotationAxis * turnSpeed, ForceMode.Acceleration);
                 }
                 else if (!avoidLeft && !avoidRight) //Full speed ahead
                 {
-                    sealifeRB.AddRelativeForce(forwardVector * Speed, ForceMode.Force);
+                    sealifeRB.AddRelativeForce(forwardVector * forwardSpeed, ForceMode.Force);
                 }
                 else if (avoidLeft && avoidRight) //Still full speed ahead
                 {
-                    sealifeRB.AddRelativeForce(forwardVector * Speed, ForceMode.Force);
+                    sealifeRB.AddRelativeForce(forwardVector * forwardSpeed, ForceMode.Force);
                 }
+                //Panic and scramble if stuck!
+                if (sealifeRB.velocity.magnitude < minimumSpeed) { turningAway = true; StartCoroutine("PanicTurn"); } 
             }
 
             //Nudge the sealife a little up or down if it gets stuck vertically
             if (Physics.SphereCast(rayOrigin.transform.position, .05f, (raycastDirection + raycastUpDirection), out topHitData, avoidanceDistance * vertMultiplier, layerMask))
             {
-                sealifeRB.AddTorque(pitchAxis * Speed * .125f, ForceMode.Force);
+                sealifeRB.AddTorque(pitchAxis * turnSpeed, ForceMode.Force);
             }
             if (Physics.SphereCast(rayOrigin.transform.position, .05f, (raycastDirection - raycastUpDirection), out bottomHitData, avoidanceDistance * vertMultiplier, layerMask))
             {
-                sealifeRB.AddTorque(-pitchAxis * Speed * .125f, ForceMode.Force);
+                sealifeRB.AddTorque(-pitchAxis * turnSpeed, ForceMode.Force);
             }
 
             // X- & Z-axis correction to keep sealife upright
             q = Quaternion.FromToRotation(raycastUpDirection, correctionVector) * transform.rotation;
-            transform.rotation = Quaternion.Slerp(transform.rotation, q, Time.deltaTime * Speed * .5f);
+            transform.rotation = Quaternion.Slerp(transform.rotation, q, Time.deltaTime * forwardSpeed * .5f);
         }
-
-
-
     }
 
     IEnumerator TurnAround()
     {
-        sealifeRB.AddTorque(rotationAxis * Speed * Random.Range(-3f, 3f), ForceMode.Impulse);
+        sealifeRB.AddTorque(rotationAxis * forwardSpeed * Random.Range(-3f, 3f), ForceMode.Impulse);
         yield return new WaitForSeconds(2f);
         turningAway = false;
     }
 
     IEnumerator TurnAway(string direction)
     {
-        if (direction == "right") { sealifeRB.AddTorque(rotationAxis * Speed * Random.Range(4f, 6f), ForceMode.Impulse); }
-        else { sealifeRB.AddTorque(-rotationAxis * Speed * Random.Range(4f, 6f), ForceMode.Impulse); }
+        if (direction == "right") { sealifeRB.AddTorque(rotationAxis * forwardSpeed * Random.Range(4f, 6f), ForceMode.Impulse); }
+        else { sealifeRB.AddTorque(-rotationAxis * forwardSpeed * Random.Range(4f, 6f), ForceMode.Impulse); }
         yield return new WaitForSeconds(2f);
         turningAway = false;
     }
 
     IEnumerator PanicTurn()
     {
-        sealifeRB.AddTorque(rotationAxis * Speed * Random.Range(-8f, 8f), ForceMode.Impulse);
+        sealifeRB.AddTorque(rotationAxis * forwardSpeed * Random.Range(-8f, 8f), ForceMode.Impulse);
         yield return new WaitForSeconds(2f);
         turningAway = false;
     }
