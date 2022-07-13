@@ -1,16 +1,16 @@
-# XR Portfolio 2022 - Manuel Yupa
+# XR Portfolio 2022 - Emmy Yupa
 
 This portfolio includes the below:
 
-"VR Tools," a Unity VR project expanding BNG's VR Interaction Framework with tools to provide interaction guidance and more to players in VR. For example: display guide hands on grabbable objects, based on a player's dominant hand. Highlight collider triggers to guide interaction. Reset items to their point of origin. And for underwater scenarios: create water waves using hand motion to affect the environment, and trigger bioluminescence through physical contact or water waves. This includes scripts in VR Tools Scripts. This project can be downloaded at https://drive.google.com/file/d/1_v7PDv75qlZv9y-9Pty3BquM4xxyFNZI/view?usp=sharing
+"VR Tools," a Unity VR project expanding BNG's VR Interaction Framework with tools to provide interaction guidance and more to players in VR. For example: display guide hands on grabbable objects, based on a player's dominant hand. Highlight collider triggers to guide interaction. Reset items to their point of origin. And for underwater scenarios: create water waves using hand motion to affect the environment, and trigger bioluminescence through physical contact or water waves. This includes scripts in VR Tools Scripts. This project can be downloaded at https://drive.google.com/file/d/1_v7PDv75qlZv9y-9Pty3BquM4xxyFNZI
 
-"ARquarium" scripts. Currently in development, using Unity for the Magic Leap. This project overlays an underwater mesh to immerse the player in an AR aquarium built upon their environment. Sea-life grows spontaneously on and swims around the player’s living room, office, or anywhere. Using hand-tracking, players can also push water around and interact with bioluminescent fish and seaweeds. Arriving late Spring 2022.
+"Your Life Underwater" scripts. Currently in development, using Unity for the Magic Leap. This project overlays an underwater mesh to immerse the player in an AR aquarium built upon their environment. Sea-life grows spontaneously on and swims around the player’s living room, office, or anywhere. Using hand-tracking, players can also push water around and interact with bioluminescent fish and seaweeds. Arriving late Summer 2022. An in-progress build can be downloaded at https://drive.google.com/file/d/1wDsLL7bgWyPbL5fDd2yNdqK3kcu0nMwp
 
-"Your Next Dream Will Begin Shortly" and "Decay Exists As An Extant Form Of Life," two Unity VR experiences built for the Meta Quest. This also includes 3D models in Character Models and scripts in VR Experience Scripts. The experiences can be downloaded as a single build at https://drive.google.com/file/d/1PZkRtXg8s0e0PVX5H7qOtgyaEfJkA6e_/view?usp=sharing
+"Your Next Dream Will Begin Shortly" and "Decay Exists As An Extant Form Of Life," two Unity VR experiences built for the Meta Quest. This also includes 3D models in Character Models and scripts in VR Experience Scripts. The experiences can be downloaded as a single build at https://drive.google.com/file/d/1PZkRtXg8s0e0PVX5H7qOtgyaEfJkA6e_
 
-"The Train Rumbles Overhead Like A Warm Thunderstorm," an Unreal VR Experience for Windows Desktop. The experience can be downloaded at https://drive.google.com/file/d/1vhTikk6SuGdOb-yDCZXgf5R3yQwGbn0t/view?usp=sharing
+"The Train Rumbles Overhead Like A Warm Thunderstorm," an Unreal VR Experience for Windows Desktop. The experience can be downloaded at https://drive.google.com/file/d/1vhTikk6SuGdOb-yDCZXgf5R3yQwGbn0t
 
-Cat Simulator, a Unity project for Windows Desktop. This build can be downloaded at https://drive.google.com/file/d/1qfMWHw0OZYZ2PcLaTRl9NPbut-I_zcSJ/view?usp=sharing
+Cat Simulator, a Unity project for Windows Desktop. This build can be downloaded at https://drive.google.com/file/d/1qfMWHw0OZYZ2PcLaTRl9NPbut-I_zcSJ
 
 "Photon," a collection of scripts implementing Photon to network values, game objects, and animation in Unity for multiplayer experiences.
 
